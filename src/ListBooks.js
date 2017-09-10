@@ -4,14 +4,6 @@ import { Link } from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
 
 class ListBooks extends Component {
-    state = {
-        books: []
-    }
-    componentDidMount() {
-        BooksAPI.getAll().then((books) => {
-            this.setState({ books })
-        })
-    }
     render() {
         const shelves = [
             {
@@ -39,7 +31,7 @@ class ListBooks extends Component {
                             <Shelf
                                 key={shelf.name}
                                 title={shelf.title}
-                                books={this.state.books.filter((book) => book.shelf === shelf.name)}
+                                books={this.props.books.filter((book) => book.shelf === shelf.name)}
                                 onUpdateShelf={this.props.onUpdateShelf}
                             />
                         ))}

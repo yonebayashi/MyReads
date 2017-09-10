@@ -7,40 +7,38 @@ import * as BooksAPI from "./BooksAPI"
 class SearchBooks extends Component {
     state = {
         query: '',
-        books: []
-    }
-    componentDidMount() {
-        BooksAPI.getAll().then((books) => {
-            this.setState({ books })
-        })
+        searchBooks: []
     }
     updateQuery = (q) => {
         this.setState({
-            query: q,
+            query: q
         })
+        BooksAPI.search(q, 20).then(searchBooks => {
 
-        BooksAPI.search(q, 20).then(books => {
-            books.map(book => {
-                if (book.shelf === undefined) {
-                    book.shelf = 'none'
+            this.props.books.forEach(updateBookState)
+
+            function updateBookState(book) {
+                if (searchBooks !== undefined || searchBooks !== null) {
+                    searchBooks.forEach(b => {
+                        (b.id === book.id) ? (b.shelf = book.shelf) : (b)
+                        {(b.shelf === undefined) && (b.shelf = 'none')}
+                    })
                 }
-            })
+            }
 
-            this.setState({
-                books: books
-            })
+            this.setState({ searchBooks: searchBooks })
         })
     }
     render() {
-        const { query, books } = this.state
+        const { query, searchBooks } = this.state
         const { onUpdateShelf } = this.props
         let showingBooks
 
         if (query) {
             const match = new RegExp(escapeRegEx(query), "i")
-            showingBooks = books.filter((book) => match.test(book.title || book.authors))
+            showingBooks = searchBooks.filter((book) => match.test(book.title || book.authors))
         } else {
-            showingBooks = books
+            showingBooks = searchBooks
         }
 
         showingBooks.sort(sortBy('title', 'authors'))
